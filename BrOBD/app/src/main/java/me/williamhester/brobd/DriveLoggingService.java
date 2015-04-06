@@ -23,12 +23,15 @@ import io.realm.Realm;
  */
 public class DriveLoggingService extends Service {
 
-    private Handler mHandler;
     private static final long LOGGING_INTERVAL = 1000L;
-    private static int fakeSpeed = 0;
-    private boolean mRunning = false;
 
+    // The Handler that will control the logging loop.
+    private Handler mHandler;
+    private boolean mRunning = false;
     private Realm mRealm;
+
+    // Temporary variable to show a continuous value for the speed field
+    private static int fakeSpeed = 0;
 
     @Override
     public void onCreate() {
@@ -50,6 +53,7 @@ public class DriveLoggingService extends Service {
             return 0;
         }
         if (mRunning) {
+            // Don't restart the service.
             return 0;
         }
 
