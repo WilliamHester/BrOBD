@@ -4,6 +4,10 @@
     <!-- MainActivity -->
     <string name="app_is_running">BrOBD is collecting driver data.</string>
     <string name="stop">Stop</string>
+    <string name="action_bluetooth">Select Bluetooth Adapter</string>
+    <string name="confirm">Confirm</string>
+    <string name="you_must_enable_bluetooth">You must enable bluetooth in order to use BrOBD</string>
+    <string name="select_bluetooth_device">Select a Bluetooth Device</string>
 
     <!-- DriverSelectionFragment -->
     <string name="go">Go</string>
@@ -18,6 +22,7 @@
     <string name="stop_data_collection">Stop data collection</string>
     <string name="are_you_sure">Are you sure you want to go back? Data collection will be stopped.</string>
     <string name="yes">Yes</string>
+    <string name="title_activity_test">test</string>
 
 
 </resources>
