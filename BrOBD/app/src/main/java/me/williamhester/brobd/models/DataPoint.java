@@ -1,4 +1,4 @@
-package me.williamhester.brobd;
+package me.williamhester.brobd.models;
 
 import java.util.Date;
 

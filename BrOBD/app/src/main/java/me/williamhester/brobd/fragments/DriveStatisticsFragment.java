@@ -1,4 +1,4 @@
-package me.williamhester.brobd;
+package me.williamhester.brobd.fragments;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,6 +11,8 @@ import android.widget.TextView;
 import java.util.Date;
 
 import io.realm.Realm;
+import me.williamhester.brobd.R;
+import me.williamhester.brobd.models.DataPoint;
 
 /**
  * This fragment shows live data about the current Drive Session.

@@ -1,4 +1,4 @@
-package me.williamhester.brobd;
+package me.williamhester.brobd.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -6,6 +6,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
+
+import me.williamhester.brobd.R;
+import me.williamhester.brobd.fragments.DriveStatisticsFragment;
+import me.williamhester.brobd.services.DriveLoggingService;
 
 /**
  * This is the activity that is running when a user wants to see their current data and the

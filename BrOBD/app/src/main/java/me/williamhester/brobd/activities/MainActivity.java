@@ -1,4 +1,4 @@
-package me.williamhester.brobd;
+package me.williamhester.brobd.activities;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -9,6 +9,10 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.ActionBarActivity;
+
+import me.williamhester.brobd.R;
+import me.williamhester.brobd.fragments.DriverSelectionFragment;
+import me.williamhester.brobd.services.DriveLoggingService;
 
 
 /**

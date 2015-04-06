@@ -1,4 +1,4 @@
-package me.williamhester.brobd;
+package me.williamhester.brobd.services;
 
 import android.app.NotificationManager;
 import android.app.Service;
@@ -13,6 +13,9 @@ import android.util.Log;
 import java.util.Date;
 
 import io.realm.Realm;
+import me.williamhester.brobd.models.DataPoint;
+import me.williamhester.brobd.models.DriveSession;
+import me.williamhester.brobd.models.Driver;
 
 /**
  * This service runs in the background on a separate thread to collect information about the car.

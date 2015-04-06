@@ -1,4 +1,4 @@
-package me.williamhester.brobd;
+package me.williamhester.brobd.fragments;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -17,6 +17,9 @@ import android.widget.Toast;
 import java.util.List;
 
 import io.realm.Realm;
+import me.williamhester.brobd.activities.MainActivity;
+import me.williamhester.brobd.R;
+import me.williamhester.brobd.models.Driver;
 
 /**
  * This fragment displays all of the drivers and allows the user to select one or create a new one.
