@@ -7,9 +7,13 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
+
 import me.williamhester.brobd.R;
 import me.williamhester.brobd.fragments.DriveStatisticsFragment;
 import me.williamhester.brobd.services.DriveLoggingService;
+import me.williamhester.brobd.singletons.BusManager;
 
 /**
  * This is the activity that is running when a user wants to see their current data and the
@@ -22,6 +26,9 @@ public class LoggingActivity extends ActionBarActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bus bus = BusManager.getInstance();
+        bus.register(this);
+
         setContentView(R.layout.activity_container);
 
         Fragment f = getSupportFragmentManager().findFragmentById(R.id.container);
@@ -59,5 +66,23 @@ public class LoggingActivity extends ActionBarActivity {
                     }
                 })
                 .show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        Bus bus = BusManager.getInstance();
+        bus.unregister(this);
+    }
+
+    /**
+     * Called by the DriveLoggingService when it is stopped. This finishes the Activity.
+     *
+     * @param cancel throw this away for now.
+     */
+    @Subscribe
+    public void onLoggingStopped(DriveLoggingService.LoggingStoppedEvent cancel) {
+        finish();
     }
 }

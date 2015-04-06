@@ -16,6 +16,7 @@ import io.realm.Realm;
 import me.williamhester.brobd.models.DataPoint;
 import me.williamhester.brobd.models.DriveSession;
 import me.williamhester.brobd.models.Driver;
+import me.williamhester.brobd.singletons.BusManager;
 
 /**
  * This service runs in the background on a separate thread to collect information about the car.
@@ -49,9 +50,15 @@ public class DriveLoggingService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Bundle extras = intent.getExtras();
         if (extras.getBoolean("stop")) {
+            // Remove the notification
             NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.cancel(0);
+
+            // Kill the LoggingActivity
+            BusManager.getInstance().post(new LoggingStoppedEvent());
+
+            // Kill the service (this)
             stopSelf();
             return 0;
         }
@@ -116,5 +123,7 @@ public class DriveLoggingService extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
+
+    public static class LoggingStoppedEvent {}
 
 }
