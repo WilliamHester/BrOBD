@@ -1,15 +1,28 @@
 package me.williamhester.brobd;
 
+import java.util.Date;
+
 import io.realm.RealmObject;
 
 /**
- * Created by william on 4/5/15.
+ * This class represents exactly one interval at which the app is running.
+ * It holds all of the information that could be collected about the car.
+ *
+ * @author William Hester
  */
 public class DataPoint extends RealmObject {
 
+    private Date date;
     private int speed;
     private int rpm;
-    private long epochTime;
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
 
     public int getSpeed() {
         return speed;
@@ -27,11 +40,4 @@ public class DataPoint extends RealmObject {
         this.rpm = rpm;
     }
 
-    public long getEpochTime() {
-        return epochTime;
-    }
-
-    public void setEpochTime(long epochTime) {
-        this.epochTime = epochTime;
-    }
 }

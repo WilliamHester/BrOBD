@@ -1,6 +1,23 @@
 <resources>
     <string name="app_name">BrOBD</string>
 
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <!-- MainActivity -->
+    <string name="app_is_running">BrOBD is collecting driver data.</string>
+    <string name="stop">Stop</string>
+
+    <!-- DriverSelectionFragment -->
+    <string name="go">Go</string>
+    <string name="new_driver">New driver</string>
+    <string name="select_a_driver">Select a driver</string>
+    <string name="name">Name</string>
+    <string name="create">Create</string>
+    <string name="cancel">Cancel</string>
+    <string name="driver_exists">That driver already exists</string>
+
+    <!-- LoggingActivity -->
+    <string name="stop_data_collection">Stop data collection</string>
+    <string name="are_you_sure">Are you sure you want to go back? Data collection will be stopped.</string>
+    <string name="yes">Yes</string>
+
+
 </resources>
