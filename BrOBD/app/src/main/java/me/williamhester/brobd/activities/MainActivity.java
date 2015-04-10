@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -59,6 +60,12 @@ public class MainActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        final SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+        String selectedDevice = prefs.getString("bluetooth_address", null);
+        MenuItem item = menu.findItem(R.id.action_bluetooth);
+        if (selectedDevice != null) {
+            item.setIcon(R.drawable.ic_bluetooth_connected_white_24dp);
+        }
         return true;
     }
 
@@ -159,7 +166,8 @@ public class MainActivity extends ActionBarActivity {
                             String deviceAddress = deviceAddresses.get(position);
                             SharedPreferences.Editor editor = prefs.edit();
                             editor.putString("bluetooth_address", deviceAddress);
-                            editor.commit();
+                            editor.apply();
+                            invalidateOptionsMenu();
                             if (mDriver != null) {
                                 onDriverSelected(mDriver);
                             }

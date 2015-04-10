@@ -88,6 +88,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="cardview-v7-22.0.0" level="project" />
     <orderEntry type="library" exported="" name="obd-java-api-0.8" level="project" />
+    <orderEntry type="library" exported="" name="graphview-4.0.0" level="project" />
     <orderEntry type="library" exported="" name="support-v4-22.0.0" level="project" />
     <orderEntry type="library" exported="" name="realm-android-0.80.0" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-22.0.0" level="project" />

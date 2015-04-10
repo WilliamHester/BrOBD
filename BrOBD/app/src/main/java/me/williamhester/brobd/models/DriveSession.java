@@ -1,5 +1,7 @@
 package me.williamhester.brobd.models;
 
+import java.util.Date;
+
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -10,15 +12,14 @@ import io.realm.annotations.PrimaryKey;
  */
 public class DriveSession extends RealmObject {
 
-    @PrimaryKey
-    private long startTime;
+    private Date startTime;
     private Driver driver;
 
-    public long getStartTime() {
+    public Date getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(long startTime) {
+    public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
 

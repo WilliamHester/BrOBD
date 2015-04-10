@@ -1,5 +1,7 @@
 package me.williamhester.brobd.models;
 
+import android.support.annotation.NonNull;
+
 import java.util.Date;
 
 import io.realm.RealmObject;
@@ -16,6 +18,7 @@ public class DataPoint extends RealmObject {
     private int speed;
     private int rpm;
 
+    @NonNull
     public Date getDate() {
         return date;
     }
@@ -39,5 +42,4 @@ public class DataPoint extends RealmObject {
     public void setRpm(int rpm) {
         this.rpm = rpm;
     }
-
 }

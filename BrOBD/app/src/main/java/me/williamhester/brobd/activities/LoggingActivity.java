@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -83,6 +84,12 @@ public class LoggingActivity extends ActionBarActivity {
      */
     @Subscribe
     public void onLoggingStopped(DriveLoggingService.LoggingStoppedEvent cancel) {
+        finish();
+    }
+
+    @Subscribe
+    public void onLoggingFailedToConnect(DriveLoggingService.CouldNotConnectEvent e) {
+        Log.d("LoggingActivity", "Could not connect to bluetooth adapter");
         finish();
     }
 }
