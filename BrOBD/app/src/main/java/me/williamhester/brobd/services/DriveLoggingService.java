@@ -26,13 +26,13 @@ import me.williamhester.brobd.models.DataPoint;
 import me.williamhester.brobd.models.DriveSession;
 import me.williamhester.brobd.models.Driver;
 import me.williamhester.brobd.singletons.BusManager;
-import pt.lighthouselabs.obd.commands.SpeedObdCommand;
-import pt.lighthouselabs.obd.commands.engine.EngineRPMObdCommand;
-import pt.lighthouselabs.obd.commands.protocol.EchoOffObdCommand;
-import pt.lighthouselabs.obd.commands.protocol.LineFeedOffObdCommand;
-import pt.lighthouselabs.obd.commands.protocol.SelectProtocolObdCommand;
-import pt.lighthouselabs.obd.commands.protocol.TimeoutObdCommand;
-import pt.lighthouselabs.obd.enums.ObdProtocols;
+import me.williamhester.obd.commands.SpeedObdCommand;
+import me.williamhester.obd.commands.engine.EngineRPMObdCommand;
+import me.williamhester.obd.commands.protocol.EchoOffObdCommand;
+import me.williamhester.obd.commands.protocol.LineFeedOffObdCommand;
+import me.williamhester.obd.commands.protocol.SelectProtocolObdCommand;
+import me.williamhester.obd.commands.protocol.TimeoutObdCommand;
+import me.williamhester.obd.enums.ObdProtocols;
 
 /**
  * This service runs in the background on a separate thread to collect information about the car.
@@ -142,6 +142,7 @@ public class DriveLoggingService extends Service {
     }
 
     private final Runnable mDriveLogger = new Runnable() {
+        @Override
         public void run() {
             long startTime = System.currentTimeMillis();
             // Get the current data and store it to the Realm

@@ -36,8 +36,11 @@ public class DriveStatisticsFragment extends Fragment {
 
     private GraphView mGraph;
     private TextView mSpeed;
+    private TextView mMaxSpeed;
     private Handler mHandler = new Handler();
     private Realm mRealm;
+
+    private int mMaxMph;
 
     private LineGraphSeries<DataPointWrapper> mSeries;
 
@@ -57,6 +60,7 @@ public class DriveStatisticsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_drive_statistics, container, false);
         mSpeed = (TextView) v.findViewById(R.id.speed);
+        mMaxSpeed = (TextView) v.findViewById(R.id.max_speed);
         mGraph = (GraphView) v.findViewById(R.id.speedGraph);
         onCreateGraph();
 
@@ -135,12 +139,14 @@ public class DriveStatisticsFragment extends Fragment {
                         .findFirst();
                 if (latest != null) {
                     mSpeed.setText(latest.getSpeed() + " mph");
+                    DataPointWrapper wrapper = new DataPointWrapper(latest);
+                    mSeries.appendData(wrapper, true, MAX_SPEED_DATA_POINTS);
+                    if (latest.getSpeed() > mMaxMph) {
+                        mMaxMph = latest.getSpeed();
+                        mMaxSpeed.setText("Max Speed: " + mMaxMph + " mph");
+                    }
                 }
-
                 mLatestDate = tempLatest;
-                DataPointWrapper wrapper = new DataPointWrapper(latest);
-                mSeries.appendData(wrapper, true, MAX_SPEED_DATA_POINTS);
-                Log.d("DriveStatisticsFragment", "x=" + wrapper.getX());
             }
 
             long endTime = System.currentTimeMillis();

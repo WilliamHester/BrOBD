@@ -3,9 +3,11 @@ package me.williamhester.brobd.activities;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.app.TaskStackBuilder;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,18 +15,29 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Set;
 
 import me.williamhester.brobd.R;
 import me.williamhester.brobd.fragments.DriverSelectionFragment;
 import me.williamhester.brobd.services.DriveLoggingService;
+import me.williamhester.obd.ObdConfig;
+import me.williamhester.obd.commands.protocol.EchoOffObdCommand;
+import me.williamhester.obd.commands.protocol.LineFeedOffObdCommand;
+import me.williamhester.obd.commands.protocol.ResetMilObdCommand;
+import me.williamhester.obd.commands.protocol.SelectProtocolObdCommand;
+import me.williamhester.obd.commands.protocol.TimeoutObdCommand;
+import me.williamhester.obd.enums.ObdProtocols;
 
 
 /**
@@ -51,6 +64,7 @@ public class MainActivity extends ActionBarActivity {
                     .replace(R.id.container, f, "DriverSelector")
                     .commit();
         }
+        ObdConfig.setDelay(200);
         if (savedInstanceState != null) {
             mDriver = savedInstanceState.getString("driver");
         }
@@ -75,6 +89,9 @@ public class MainActivity extends ActionBarActivity {
 
         if (id == R.id.action_bluetooth) {
             showBluetoothPicker();
+            return true;
+        } else if (id == R.id.action_reset_mil) {
+            resetCheckEngineLight();
             return true;
         }
 
@@ -224,6 +241,70 @@ public class MainActivity extends ActionBarActivity {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(0, builder.build());
+    }
+
+    private void resetCheckEngineLight() {
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle(R.string.reset_mil);
+        progressDialog.setCancelable(false);
+        progressDialog.setMessage("Resetting Check Engine Light.");
+        progressDialog.show();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String address = getSharedPreferences("prefs", MODE_PRIVATE)
+                        .getString("bluetooth_address", null);
+                BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
+                BluetoothDevice device = btAdapter.getRemoteDevice(address);
+
+                // Cancel any active device discovery, as it will crash the app if a connection
+                //     is attempted when discovery is active.
+                btAdapter.cancelDiscovery();
+
+                try {
+                    final Method m = device.getClass().getMethod("createRfcommSocket", int.class);
+                    BluetoothSocket socket = (BluetoothSocket) m.invoke(device, 1);
+                    socket.connect();
+
+                    InputStream in = socket.getInputStream();
+                    OutputStream out = socket.getOutputStream();
+
+                    new EchoOffObdCommand().run(in, out);
+                    new LineFeedOffObdCommand().run(in, out);
+                    new TimeoutObdCommand(255).run(in, out);
+                    new SelectProtocolObdCommand(ObdProtocols.AUTO).run(in, out);
+
+                    final ResetMilObdCommand cmd = new ResetMilObdCommand();
+                    cmd.run(in, out);
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this, "Reset MIL; result = " +
+                                    cmd.getResult(), Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                    socket.close();
+                } catch (final IOException | InterruptedException | NoSuchMethodException |
+                        IllegalAccessException | InvocationTargetException e) {
+                    // TODO: Split these into more descriptive fail notifications, but for now
+                    // Gotta catch 'em all
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this, "Could not reset MIL.", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog.dismiss();
+                    }
+                });
+            }
+        }).start();
     }
 
 }

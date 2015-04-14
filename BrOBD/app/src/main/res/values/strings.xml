@@ -8,6 +8,7 @@
     <string name="confirm">Confirm</string>
     <string name="you_must_enable_bluetooth">You must enable bluetooth in order to use BrOBD</string>
     <string name="select_bluetooth_device">Select a Bluetooth Device</string>
+    <string name="reset_mil">Reset CEL</string>
 
     <!-- DriverSelectionFragment -->
     <string name="go">Go</string>

@@ -4,7 +4,11 @@
     tools:context="me.williamhester.brobd.activities.test">
     <item android:id="@+id/action_bluetooth"
         android:title="@string/action_bluetooth"
-        android:orderInCategory="100"
+        android:orderInCategory="1"
         android:icon="@drawable/ic_settings_bluetooth_white_24dp"
         app:showAsAction="ifRoom" />
+    <item android:id="@+id/action_reset_mil"
+        android:title="@string/reset_mil"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
 </menu>
