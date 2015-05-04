@@ -5,8 +5,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -14,6 +16,7 @@ import com.squareup.otto.Subscribe;
 import me.williamhester.brobd.R;
 import me.williamhester.brobd.fragments.DriveStatisticsFragment;
 import me.williamhester.brobd.services.DriveLoggingService;
+import me.williamhester.brobd.services.FakeDriveLoggingService;
 import me.williamhester.brobd.singletons.BusManager;
 
 /**
@@ -22,7 +25,7 @@ import me.williamhester.brobd.singletons.BusManager;
  *
  * @author William Hester
  */
-public class LoggingActivity extends ActionBarActivity {
+public class LoggingActivity extends AppCompatActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,6 +42,10 @@ public class LoggingActivity extends ActionBarActivity {
                     .replace(R.id.container, f, "DriveStats")
                     .commit();
         }
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     @Override
@@ -49,14 +56,12 @@ public class LoggingActivity extends ActionBarActivity {
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
                         Intent serviceKiller = new Intent(LoggingActivity.this,
-                                DriveLoggingService.class);
+                                FakeDriveLoggingService.class);
                         Bundle args = new Bundle();
                         args.putBoolean("stop", true);
                         serviceKiller.putExtras(args);
                         startService(serviceKiller);
-
                         LoggingActivity.super.onBackPressed();
                     }
                 })
@@ -67,6 +72,15 @@ public class LoggingActivity extends ActionBarActivity {
                     }
                 })
                 .show();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -89,6 +103,7 @@ public class LoggingActivity extends ActionBarActivity {
 
     @Subscribe
     public void onLoggingFailedToConnect(DriveLoggingService.CouldNotConnectEvent e) {
+        Toast.makeText(this, "Could not connect to bluetooth adapter", Toast.LENGTH_LONG).show();
         Log.d("LoggingActivity", "Could not connect to bluetooth adapter");
         finish();
     }

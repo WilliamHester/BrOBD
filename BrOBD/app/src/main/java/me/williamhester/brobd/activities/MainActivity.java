@@ -15,7 +15,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -30,7 +30,7 @@ import java.util.Set;
 
 import me.williamhester.brobd.R;
 import me.williamhester.brobd.fragments.DriverSelectionFragment;
-import me.williamhester.brobd.services.DriveLoggingService;
+import me.williamhester.brobd.services.FakeDriveLoggingService;
 import me.williamhester.obd.ObdConfig;
 import me.williamhester.obd.commands.protocol.EchoOffObdCommand;
 import me.williamhester.obd.commands.protocol.LineFeedOffObdCommand;
@@ -46,7 +46,7 @@ import me.williamhester.obd.enums.ObdProtocols;
  *
  * @author William Hester
  */
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
 
     public static final int REQUEST_ENABLE_BT = 1;
 
@@ -136,7 +136,8 @@ public class MainActivity extends ActionBarActivity {
         }
         mDriver = null;
 
-        Intent service = new Intent(this, DriveLoggingService.class);
+        // TODO: remove "Fake"
+        Intent service = new Intent(this, FakeDriveLoggingService.class);
         Bundle extras = new Bundle();
         extras.putString("driver", driverName);
         service.putExtras(extras);
@@ -217,7 +218,8 @@ public class MainActivity extends ActionBarActivity {
                 .setAutoCancel(false)
                 .setOngoing(true);
 
-        Intent serviceKiller = new Intent(this, DriveLoggingService.class);
+        // TODO Remove "Fake"
+        Intent serviceKiller = new Intent(this, FakeDriveLoggingService.class);
         Bundle args = new Bundle();
         args.putBoolean("stop", true);
         serviceKiller.putExtras(args);
