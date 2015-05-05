@@ -18,6 +18,7 @@ import me.williamhester.brobd.fragments.DriveStatisticsFragment;
 import me.williamhester.brobd.services.DriveLoggingService;
 import me.williamhester.brobd.services.FakeDriveLoggingService;
 import me.williamhester.brobd.singletons.BusManager;
+import me.williamhester.brobd.singletons.DebugManager;
 
 /**
  * This is the activity that is running when a user wants to see their current data and the
@@ -56,8 +57,15 @@ public class LoggingActivity extends AppCompatActivity {
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent serviceKiller = new Intent(LoggingActivity.this,
-                                FakeDriveLoggingService.class);
+                        Intent serviceKiller;
+                        if (DebugManager.DEBUG) {
+                            serviceKiller = new Intent(LoggingActivity.this,
+                                    FakeDriveLoggingService.class);
+                        } else {
+                            serviceKiller = new Intent(LoggingActivity.this,
+                                    DriveLoggingService.class);
+                        }
+
                         Bundle args = new Bundle();
                         args.putBoolean("stop", true);
                         serviceKiller.putExtras(args);

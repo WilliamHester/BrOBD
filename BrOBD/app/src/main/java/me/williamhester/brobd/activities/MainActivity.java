@@ -30,7 +30,9 @@ import java.util.Set;
 
 import me.williamhester.brobd.R;
 import me.williamhester.brobd.fragments.DriverSelectionFragment;
+import me.williamhester.brobd.services.DriveLoggingService;
 import me.williamhester.brobd.services.FakeDriveLoggingService;
+import me.williamhester.brobd.singletons.DebugManager;
 import me.williamhester.obd.ObdConfig;
 import me.williamhester.obd.commands.protocol.EchoOffObdCommand;
 import me.williamhester.obd.commands.protocol.LineFeedOffObdCommand;
@@ -64,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                     .replace(R.id.container, f, "DriverSelector")
                     .commit();
         }
-        ObdConfig.setDelay(200);
+        ObdConfig.setDelay(0);
         if (savedInstanceState != null) {
             mDriver = savedInstanceState.getString("driver");
         }
@@ -136,8 +138,12 @@ public class MainActivity extends AppCompatActivity {
         }
         mDriver = null;
 
-        // TODO: remove "Fake"
-        Intent service = new Intent(this, FakeDriveLoggingService.class);
+        Intent service;
+        if (DebugManager.DEBUG) {
+            service = new Intent(this, FakeDriveLoggingService.class);
+        } else {
+            service = new Intent(this, DriveLoggingService.class);
+        }
         Bundle extras = new Bundle();
         extras.putString("driver", driverName);
         service.putExtras(extras);
@@ -218,8 +224,12 @@ public class MainActivity extends AppCompatActivity {
                 .setAutoCancel(false)
                 .setOngoing(true);
 
-        // TODO Remove "Fake"
-        Intent serviceKiller = new Intent(this, FakeDriveLoggingService.class);
+        Intent serviceKiller;
+        if (DebugManager.DEBUG) {
+            serviceKiller = new Intent(this, FakeDriveLoggingService.class);
+        } else {
+            serviceKiller = new Intent(this, DriveLoggingService.class);
+        }
         Bundle args = new Bundle();
         args.putBoolean("stop", true);
         serviceKiller.putExtras(args);

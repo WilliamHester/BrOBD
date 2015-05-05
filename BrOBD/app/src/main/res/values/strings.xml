@@ -25,5 +25,17 @@
     <string name="yes">Yes</string>
     <string name="title_activity_test">test</string>
 
+    <!-- DriveStatisticsFragment -->
+    <string name="averages">Averages</string>
+    <string name="average_mpg">Average MPG</string>
+    <string name="average_rpm">Average RPM</string>
+    <string name="average_speed">Average speed</string>
+    <string name="average_throttle_position">Average throttle position</string>
+    <string name="live_data">Live Data</string>
+    <string name="maxima">Maxima</string>
+    <string name="max_mpg">Maximum MPG</string>
+    <string name="max_rpm">Maximum RPM</string>
+    <string name="max_speed">Maximum speed</string>
+    <string name="max_throttle_position">Maximum throttle position</string>
 
 </resources>

@@ -40,12 +40,26 @@ public class DriveStatisticsFragment extends Fragment implements OnChartValueSel
     private static final int MAX_DATA_POINTS = 101;
 
     private LineChart mChart;
-    private TextView mSpeed;
-    private TextView mMaxSpeed;
+    private TextView mAverageSpeedText;
+    private TextView mCurrentSpeedText;
+    private TextView mMaxSpeedText;
+    private TextView mCurrentDistanceText;
+    private TextView mAverageRpmText;
+    private TextView mMaxRpmText;
+    private TextView mAverageThrottleText;
+    private TextView mMaxThrottleText;
+    private TextView mElapsedTimeText;
     private Handler mHandler = new Handler();
     private Realm mRealm;
 
+    private int mMaxSpeed;
+    private int mMaxRpm;
+    private float mMaxThrottle;
     private int mMaxMph;
+    private double mAverageSpeedSum;
+    private double mAverageRpmSum;
+    private double mAverageThrottleSum;
+    private int mDataPointCount;
 
     public static DriveStatisticsFragment newInstance() {
         return new DriveStatisticsFragment();
@@ -62,9 +76,21 @@ public class DriveStatisticsFragment extends Fragment implements OnChartValueSel
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_drive_statistics, container, false);
-        mSpeed = (TextView) v.findViewById(R.id.speed);
-        mMaxSpeed = (TextView) v.findViewById(R.id.max_speed);
+        mCurrentSpeedText = (TextView) v.findViewById(R.id.live_speed);
+        mMaxSpeedText = (TextView) v.findViewById(R.id.max_speed);
         mChart = (LineChart) v.findViewById(R.id.speedGraph);
+        mCurrentDistanceText = (TextView) v.findViewById(R.id.live_distance);
+
+        mAverageSpeedText = (TextView) v.findViewById(R.id.average_speed);
+        mAverageRpmText = (TextView) v.findViewById(R.id.average_rpm);
+        mAverageThrottleText = (TextView) v.findViewById(R.id.average_throttle);
+
+        mMaxSpeedText = (TextView) v.findViewById(R.id.max_speed);
+        mMaxRpmText = (TextView) v.findViewById(R.id.max_rpm);
+        mMaxThrottleText = (TextView) v.findViewById(R.id.max_throttle);
+
+        mElapsedTimeText = (TextView) v.findViewById(R.id.live_time);
+        initAveragesAndMaxima();
 
         onCreateGraph();
 
@@ -86,7 +112,53 @@ public class DriveStatisticsFragment extends Fragment implements OnChartValueSel
         mHandler.removeCallbacks(mStatsRunnable);
     }
 
-    private void onCreateGraph() {mChart.setOnChartValueSelectedListener(this);
+    private void initAveragesAndMaxima() {
+        Date date = mRealm.where(DriveSession.class)
+                .maximumDate("startTime");
+        List<DataPoint> points = mRealm.where(DataPoint.class)
+                .greaterThan("date", date)
+                .findAllSorted("date");
+
+        for (DataPoint p : points) {
+            mAverageSpeedSum += p.getSpeed();
+            mAverageRpmSum += p.getRpm();
+            mAverageThrottleSum += p.getThrottle();
+
+            if (p.getSpeed() > mMaxSpeed) {
+                mMaxSpeed = p.getSpeed();
+            }
+            if (p.getRpm() > mMaxRpm) {
+                mMaxRpm = p.getRpm();
+            }
+            if (p.getThrottle() > mMaxThrottle) {
+                mMaxThrottle = p.getThrottle();
+            }
+        }
+        mMaxSpeedText.setText(Math.round(mMaxSpeed) + " MPH");
+        mMaxRpmText.setText(Math.round(mMaxRpm) + " RPM");
+        mMaxThrottleText.setText(String.format("%.2f%s", mMaxThrottle, "%"));
+
+        mDataPointCount = points.size();
+
+        updateAveragesAndCurrents();
+    }
+
+    private void updateAveragesAndCurrents() {
+        mAverageSpeedText.setText(Math.round(mAverageSpeedSum / mDataPointCount) + " MPH");
+        mAverageRpmText.setText(Math.round(mAverageRpmSum / mDataPointCount) + " RPM");
+        mAverageThrottleText.setText(Math.round(mAverageThrottleSum / mDataPointCount) + "%");
+
+        mCurrentDistanceText.setText(String.format("%.2f miles driven", mAverageSpeedSum / 3600.0));
+        mElapsedTimeText.setText(
+                "Elapsed time: "
+                        + String.valueOf(mDataPointCount / 3600) + ':'
+                        + String.format("%02d", mDataPointCount / 60 % 60) + ':'
+                        + String.format("%02d", mDataPointCount % 60)
+        );
+    }
+
+    private void onCreateGraph() {
+        mChart.setOnChartValueSelectedListener(this);
         mChart.setTouchEnabled(false);
         mChart.setDragEnabled(false);
         mChart.setScaleEnabled(true);
@@ -136,7 +208,7 @@ public class DriveStatisticsFragment extends Fragment implements OnChartValueSel
                     .max("speed")
                     .intValue();
 
-            mMaxSpeed.setText("Max Speed: " + mMaxMph + " mph");
+            mMaxSpeedText.setText(mMaxMph + " MPH");
 
             // get the last 30 data points
             int start = points.size() >= MAX_DATA_POINTS ? points.size() - MAX_DATA_POINTS : 0;
@@ -178,7 +250,6 @@ public class DriveStatisticsFragment extends Fragment implements OnChartValueSel
         LineDataSet set = new LineDataSet(null, "Speed");
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
         set.setColor(Color.RED);
-        set.setCircleColor(Color.RED);
         set.setLineWidth(2f);
         set.setFillAlpha(65);
         set.setFillColor(ColorTemplate.getHoloBlue());
@@ -193,7 +264,6 @@ public class DriveStatisticsFragment extends Fragment implements OnChartValueSel
         LineDataSet set = new LineDataSet(null, "RPM");
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
         set.setColor(Color.BLUE);
-        set.setCircleColor(Color.BLUE);
         set.setLineWidth(2f);
         set.setFillAlpha(65);
         set.setFillColor(ColorTemplate.getHoloBlue());
@@ -220,12 +290,31 @@ public class DriveStatisticsFragment extends Fragment implements OnChartValueSel
                         .equalTo("date", tempLatest)
                         .findFirst();
                 if (latest != null) {
-                    mSpeed.setText(latest.getSpeed() + " mph");
+                    mCurrentSpeedText.setText(latest.getSpeed() + " MPH");
                     appendData(latest.getSpeed(), latest.getRpm());
+
+                    mAverageSpeedSum += latest.getSpeed();
+                    mAverageRpmSum += latest.getRpm();
+                    mAverageThrottleSum += latest.getThrottle();
+
+                    if (latest.getSpeed() > mMaxSpeed) {
+                        mMaxSpeed = latest.getSpeed();
+                        mMaxSpeedText.setText(mMaxMph + " MPH");
+                    }
+                    if (latest.getRpm() > mMaxRpm) {
+                        mMaxRpm = latest.getRpm();
+                        mMaxRpmText.setText(mMaxRpm + " RPM");
+                    }
+                    if (latest.getThrottle() > mMaxThrottle) {
+                        mMaxThrottle = latest.getThrottle();
+                        mMaxThrottleText.setText(String.format("%.2f%s", mMaxThrottle, "%"));
+                    }
                     if (latest.getSpeed() > mMaxMph) {
                         mMaxMph = latest.getSpeed();
-                        mMaxSpeed.setText("Max Speed: " + mMaxMph + " mph");
                     }
+                    mDataPointCount++;
+
+                    updateAveragesAndCurrents();
                 }
                 mLatestDate = tempLatest;
             }

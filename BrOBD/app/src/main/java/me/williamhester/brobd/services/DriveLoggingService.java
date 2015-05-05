@@ -13,6 +13,7 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,6 +29,8 @@ import me.williamhester.brobd.models.Driver;
 import me.williamhester.brobd.singletons.BusManager;
 import me.williamhester.obd.commands.SpeedObdCommand;
 import me.williamhester.obd.commands.engine.EngineRPMObdCommand;
+import me.williamhester.obd.commands.engine.ThrottlePositionObdCommand;
+import me.williamhester.obd.commands.fuel.FuelConsumptionRateObdCommand;
 import me.williamhester.obd.commands.protocol.EchoOffObdCommand;
 import me.williamhester.obd.commands.protocol.LineFeedOffObdCommand;
 import me.williamhester.obd.commands.protocol.SelectProtocolObdCommand;
@@ -147,9 +150,11 @@ public class DriveLoggingService extends Service {
             // Get the current data and store it to the Realm
             final EngineRPMObdCommand rpm = new EngineRPMObdCommand();
             final SpeedObdCommand speed = new SpeedObdCommand();
+            final ThrottlePositionObdCommand throttle = new ThrottlePositionObdCommand();
             try {
                 rpm.run(mIn, mOut);
                 speed.run(mIn, mOut);
+                throttle.run(mIn, mOut);
             } catch (IOException|InterruptedException e) {
                 Log.d("DriveLoggingService", "Logging has failed");
                 postFailedToUiThread();
@@ -162,6 +167,7 @@ public class DriveLoggingService extends Service {
                     dataPoint.setDate(new Date(System.currentTimeMillis()));
                     dataPoint.setRpm(rpm.getRPM());
                     dataPoint.setSpeed(Math.round(speed.getImperialSpeed()));
+                    dataPoint.setThrottle(throttle.getPercentage());
                 }
             });
 
@@ -194,6 +200,23 @@ public class DriveLoggingService extends Service {
                         BusManager.getInstance().post(new LoggingStoppedEvent());
                     }
                 });
+    }
+
+    private void toastToUiThread(final String message) {
+        new Handler(Looper.getMainLooper())
+                .post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(DriveLoggingService.this, message, Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    /**
+     * @return a float.
+     */
+    public float getMpg(SpeedObdCommand speed, FuelConsumptionRateObdCommand fuel) {
+        return 235.2f / (100 / speed.getMetricSpeed()) * fuel.getLitersPerHour();
     }
 
     @Override

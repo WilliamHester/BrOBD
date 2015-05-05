@@ -17,6 +17,7 @@ public class DataPoint extends RealmObject {
     private Date date;
     private int speed;
     private int rpm;
+    private float throttle;
 
     @NonNull
     public Date getDate() {
@@ -41,5 +42,13 @@ public class DataPoint extends RealmObject {
 
     public void setRpm(int rpm) {
         this.rpm = rpm;
+    }
+
+    public float getThrottle() {
+        return throttle;
+    }
+
+    public void setThrottle(float throttle) {
+        this.throttle = throttle;
     }
 }

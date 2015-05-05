@@ -105,6 +105,7 @@ public class FakeDriveLoggingService extends Service {
                     dataPoint.setDate(new Date(System.currentTimeMillis()));
                     dataPoint.setRpm((int) (15 * (System.currentTimeMillis() / 100 % 60)));
                     dataPoint.setSpeed((int) ((System.currentTimeMillis() / 1000 % 60)));
+                    dataPoint.setThrottle((int) ((System.currentTimeMillis() / 1000 % 100)));
                 }
             });
 
